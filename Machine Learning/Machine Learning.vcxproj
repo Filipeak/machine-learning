@@ -143,14 +143,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Math\Matrix.cpp" />
-    <ClCompile Include="Algorithms\NeuralNetwork.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Math\Matrix.cpp" />
+    <ClCompile Include="src\Algorithms\NeuralNetwork.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Assert.h" />
-    <ClInclude Include="Math\Matrix.h" />
-    <ClInclude Include="Algorithms\NeuralNetwork.h" />
+    <ClInclude Include="src\Assert.h" />
+    <ClInclude Include="src\Math\Matrix.h" />
+    <ClInclude Include="src\Algorithms\NeuralNetwork.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
