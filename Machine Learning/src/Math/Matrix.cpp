@@ -1,5 +1,5 @@
 #include "Matrix.h"
-#include "../Assert.h"
+#include "../Utils/Assert.h"
 
 Matrix::Matrix()
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <functional>
 
 #include "../Math/Matrix.h"
@@ -35,10 +36,12 @@ public:
 	float CalculateCost(const array_2d_t& inputs, const array_2d_t& outputs);
 	void RandomizeLayers(float min, float max);
 
+	const NNData& GetData() const;
 	void Print();
 
 private:
 	NNData m_Data;
+	NNActivationFunction m_Func;
 	std::vector<Matrix> m_Layers;
 	std::vector<Matrix> m_LayersRaw;
 	std::function<float(float)> m_ActivationFunction;

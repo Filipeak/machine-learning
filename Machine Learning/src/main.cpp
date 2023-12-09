@@ -1,70 +1,55 @@
 ﻿/**
 * RESOURCES:
-*  - 3Blue1Brown Explanation 1: https://www.youtube.com/watch?v=aircAruvnKk
-*  - 3Blue1Brown Explanation 2: https://www.youtube.com/watch?v=IHZwWFHWa-w
-*  - 3Blue1Brown Explanation 3: https://www.youtube.com/watch?v=Ilg3gGewQ5U
-*  - 3Blue1Brown Explanation 4: https://www.youtube.com/watch?v=tIeHLnjs5U8
+*  - 3Blue1Brown Explanation: https://www.3blue1brown.com/topics/neural-networks
 *  - Example Series: https://www.youtube.com/playlist?list=PLpM-Dvs8t0VZPZKggcql-MmjaBdZKeDMw
 *
 * IDEAS:
+*  - GFX - Neural Network Visualization & Includes checkup (Glad, GLFW, Imgui)
 *  - Stochastic Gradient Descent
 *  - Exporting / Importing
-*  - Visualizing (Network, Cost Graph) - SDL
-*  - Drawing Example (Visualized) - SDL
-*  - Code in C - Arrays, structs, optimization, ...
+*  - Drawing Example
+*  - Optimization: Pointers & References checkup
 */
 
 
 #include <iostream>
-
-#include "Algorithms/NeuralNetwork.h"
+#include "GFX/Window.h"
+#include "GFX/CostPlot.h"
+#include "GFX/NeuralNetworkVisualization.h"
+#include "Examples/XORExample.h"
 
 int main()
 {
 	std::srand((unsigned int)std::time(0));
-	
-	std::vector<size_t> layers = { 2, 1 };
-	array_2d_t inputs = {
-		{0, 0},
-		{0, 1},
-		{1, 0},
-		{1, 1},
-	};
-	array_2d_t outputs = {
-		{0},
-		{1},
-		{1},
-		{1},
-	};
-	std::vector<float> params = { 0, 1 };
-	float learningRate = 0.1f;
-	float derivativeEps = 0.1f;
-	size_t iterations = 10000;
 
-	NeuralNetwork nn(layers, NNActivationFunction::Sigmoid);
+	Window::Init();
 
-	nn.RandomizeLayers(0.0f, 1.0f);
+	auto ex = XORExample();
+	auto costPlot = CostPlot();
+	auto nnVisualization = NeuralNetworkVisualization();
 
-	NNData grad;
-	grad.Alloc(layers);
+	ex.InitBackprop(0.1f, 20000);
+	ex.Prepare();
+	nnVisualization.Init();
 
-	for (size_t i = 0; i < iterations; i++)
+	while (!Window::ShouldClose())
 	{
-		//nn.Train_FiniteDifference(grad, inputs, outputs, derivativeEps);
-		nn.Train_Backpropagation(grad, inputs, outputs);
-		nn.Learn(grad, learningRate);
+		Window::BeginFrame();
 
-		grad.Clear();
+		ex.RunIteration();
+
+		if (!ex.IsFinished())
+		{
+			costPlot.Update(ex.GetCost());
+		}
+
+		costPlot.Draw();
+		nnVisualization.Update(ex.GetData());
+
+		Window::EndFrame();
 	}
 
-	std::cout << "Cost: " << nn.CalculateCost(inputs, outputs) << std::endl;
+	nnVisualization.Terminate();
 
-	nn.Print();
-
-	std::vector<float> result = nn.Forward(params);
-
-	for (size_t i = 0; i < result.size(); i++)
-	{
-		std::cout << "Result " << i << ": " << result[i] << std::endl;
-	}
+	Window::Terminate();
 }

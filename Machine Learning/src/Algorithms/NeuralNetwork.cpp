@@ -1,7 +1,9 @@
 #include "NeuralNetwork.h"
-#include "../Assert.h"
+#include "../Utils/Assert.h"
 #include <cmath>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 void NNData::Alloc(const std::vector<size_t> architecture)
 {
@@ -266,6 +268,11 @@ void NeuralNetwork::RandomizeLayers(float min, float max)
 	}
 }
 
+const NNData& NeuralNetwork::GetData() const
+{
+	return m_Data;
+}
+
 void NeuralNetwork::Print()
 {
 	for (size_t i = 0; i < m_Data.weights.size(); i++)
@@ -280,6 +287,8 @@ void NeuralNetwork::Print()
 
 void NeuralNetwork::SetActivationFunctions(NNActivationFunction func)
 {
+	m_Func = func;
+
 	switch (func)
 	{
 	case NNActivationFunction::Sigmoid:
