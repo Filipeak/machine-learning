@@ -3,13 +3,13 @@
 
 void XORExample::Prepare()
 {
-	m_Inputs = {
+	const array_2d_t inputs = {
 		{0, 0},
 		{0, 1},
 		{1, 0},
 		{1, 1},
 	};
-	m_Outputs = {
+	const array_2d_t outputs = {
 		{0},
 		{1},
 		{1},
@@ -20,9 +20,8 @@ void XORExample::Prepare()
 
 	m_NN = new NeuralNetwork(layers, NNActivationFunction::Sigmoid);
 	m_NN->RandomizeLayers(0.0f, 1.0f);
-
-	m_Grad = new NNData();
-	m_Grad->Alloc(layers);
+	m_NN->SetTrainingData(inputs, outputs);
+	m_NN->SetStochastic(2);
 }
 
 void XORExample::RunIteration()
@@ -36,22 +35,21 @@ void XORExample::RunIteration()
 	{
 		if (m_Backpropagation)
 		{
-			m_NN->Train_Backpropagation(*m_Grad, m_Inputs, m_Outputs);
+			m_NN->Train_Backpropagation();
 		}
 		else
 		{
-			m_NN->Train_FiniteDifference(*m_Grad, m_Inputs, m_Outputs, m_DerivativeEps);
+			m_NN->Train_FiniteDifference();
 		}
 
-		m_NN->Learn(*m_Grad, m_LearningRate);
-		m_Grad->Clear();
+		m_NN->Learn(m_LearningRate);
 
 		m_CurrentIteration++;
 	}
 	else
 	{
 		std::cout << " ======= Current Neural Network Data ======= ";
-		std::cout << " > Cost: " << m_NN->CalculateCost(m_Inputs, m_Outputs) << std::endl;
+		std::cout << " > Cost: " << m_NN->CalculateCost(m_NN->GetBatches()) << std::endl;
 
 		m_NN->Print();
 
@@ -66,7 +64,6 @@ void XORExample::RunIteration()
 		std::cout << "==========================================" << std::endl;
 
 		delete m_NN;
-		delete m_Grad;
 
 		m_Finished = true;
 	}
@@ -76,7 +73,7 @@ float XORExample::GetCost()
 {
 	if (!m_Finished)
 	{
-		return m_NN->CalculateCost(m_Inputs, m_Outputs);
+		return m_NN->CalculateCost(m_NN->GetBatches());
 	}
 	else
 	{

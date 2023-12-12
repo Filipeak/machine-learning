@@ -12,7 +12,7 @@ void CostPlot::Draw()
 
 	static ImGuiTableFlags flags = ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable;
 
-	if (ImGui::BeginTable("##table", 3, flags, ImVec2(900, 100)))
+	if (ImGui::BeginTable("##table", 3, flags, ImVec2(900, 200)))
 	{
 		ImGui::TableSetupColumn("Iteration", ImGuiTableColumnFlags_WidthFixed, 100);
 		ImGui::TableSetupColumn("Cost", ImGuiTableColumnFlags_WidthFixed, 100);
@@ -28,7 +28,7 @@ void CostPlot::Draw()
 		ImGui::TableSetColumnIndex(2);
 		ImGui::PushID(0);
 
-		Sparkline("##spark", m_Costs.data(), (int)m_Costs.size(), 0.0f, 0.25f, 0, ImPlot::GetColormapColor(0), ImVec2(-1, 100));
+		Sparkline("##spark", m_Costs.data(), (int)m_Costs.size(), 0.0f, 0.25f, 0, ImPlot::GetColormapColor(0), ImVec2(-1, 200));
 
 		ImGui::PopID();
 		ImPlot::PopColormap();

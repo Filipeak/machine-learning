@@ -1,11 +1,10 @@
 #include "NeuralNetwork.h"
 #include "../Utils/Assert.h"
 #include <cmath>
+#include <algorithm>
 #include <iostream>
-#include <fstream>
-#include <sstream>
 
-void NNData::Alloc(const std::vector<size_t> architecture)
+void NNData::Alloc(const std::vector<size_t>& architecture)
 {
 	arch = architecture;
 
@@ -50,15 +49,19 @@ NeuralNetwork::NeuralNetwork(const std::vector<size_t>& architecture, NNActivati
 	}
 
 	m_Data.Alloc(architecture);
+	m_Gradient.Alloc(architecture);
+	m_BatchesCount = 0;
 
 	SetActivationFunctions(func);
 }
 
-void NeuralNetwork::Train_Backpropagation(NNData& gradient, const array_2d_t& inputs, const array_2d_t& outputs)
+void NeuralNetwork::Train_Backpropagation()
 {
-	ASSERT(inputs.size() == outputs.size());
+	m_Gradient.Clear();
 
-	const size_t inputs_size = inputs.size();
+	const std::vector<NNBatch> batches = GetBatches();
+
+	const size_t inputs_size = batches.size();
 	const size_t last_layer_index = m_Layers.size() - 1;
 
 	std::vector<Matrix> acts;
@@ -70,7 +73,7 @@ void NeuralNetwork::Train_Backpropagation(NNData& gradient, const array_2d_t& in
 
 	for (size_t i = 0; i < inputs_size; i++)
 	{
-		const std::vector<float>& result = Forward(inputs[i]);
+		const std::vector<float> result = Forward(batches[i].inputs);
 
 		for (size_t l = last_layer_index; l > 0; l--)
 		{
@@ -78,14 +81,14 @@ void NeuralNetwork::Train_Backpropagation(NNData& gradient, const array_2d_t& in
 			{
 				if (l == last_layer_index)
 				{
-					acts[l].ValueAt(j, 0) = 2 * (result[j] - outputs[i][j]);
+					acts[l].ValueAt(j, 0) = 2 * (result[j] - batches[i].outputs[j]);
 				}
 
-				gradient.biases[l - 1].ValueAt(j, 0) += acts[l].ValueAt(j, 0) * m_ActivationFunctionDerivative(m_LayersRaw[l].ValueAt(j, 0));
+				m_Gradient.biases[l - 1].ValueAt(j, 0) += acts[l].ValueAt(j, 0) * m_ActivationFunctionDerivative(m_LayersRaw[l].ValueAt(j, 0));
 
 				for (size_t k = 0; k < m_Layers[l - 1].GetRowsSize(); k++)
 				{
-					gradient.weights[l - 1].ValueAt(j, k) += acts[l].ValueAt(j, 0) * m_ActivationFunctionDerivative(m_LayersRaw[l].ValueAt(j, 0)) * m_Layers[l - 1].ValueAt(k, 0);
+					m_Gradient.weights[l - 1].ValueAt(j, k) += acts[l].ValueAt(j, 0) * m_ActivationFunctionDerivative(m_LayersRaw[l].ValueAt(j, 0)) * m_Layers[l - 1].ValueAt(k, 0);
 
 					acts[l - 1].ValueAt(k, 0) += acts[l].ValueAt(j, 0) * m_ActivationFunctionDerivative(m_LayersRaw[l].ValueAt(j, 0)) * m_Data.weights[l - 1].ValueAt(j, k);
 				}
@@ -95,34 +98,36 @@ void NeuralNetwork::Train_Backpropagation(NNData& gradient, const array_2d_t& in
 		}
 	}
 
-	for (size_t i = 0; i < gradient.weights.size(); i++)
+	for (size_t i = 0; i < m_Gradient.weights.size(); i++)
 	{
-		for (size_t j = 0; j < gradient.weights[i].GetRowsSize(); j++)
+		for (size_t j = 0; j < m_Gradient.weights[i].GetRowsSize(); j++)
 		{
-			for (size_t k = 0; k < gradient.weights[i].GetColumnsSize(); k++)
+			for (size_t k = 0; k < m_Gradient.weights[i].GetColumnsSize(); k++)
 			{
-				gradient.weights[i].ValueAt(j, k) /= inputs_size;
+				m_Gradient.weights[i].ValueAt(j, k) /= inputs_size;
 			}
 		}
 	}
 
-	for (size_t i = 0; i < gradient.biases.size(); i++)
+	for (size_t i = 0; i < m_Gradient.biases.size(); i++)
 	{
-		for (size_t j = 0; j < gradient.biases[i].GetRowsSize(); j++)
+		for (size_t j = 0; j < m_Gradient.biases[i].GetRowsSize(); j++)
 		{
-			for (size_t k = 0; k < gradient.biases[i].GetColumnsSize(); k++)
+			for (size_t k = 0; k < m_Gradient.biases[i].GetColumnsSize(); k++)
 			{
-				gradient.biases[i].ValueAt(j, k) /= inputs_size;
+				m_Gradient.biases[i].ValueAt(j, k) /= inputs_size;
 			}
 		}
 	}
 }
 
-void NeuralNetwork::Train_FiniteDifference(NNData& gradient, const array_2d_t& inputs, const array_2d_t& outputs, float eps)
+void NeuralNetwork::Train_FiniteDifference()
 {
-	ASSERT(inputs.size() == outputs.size());
+	m_Gradient.Clear();
 
-	const float base_cost = CalculateCost(inputs, outputs);
+	const std::vector<NNBatch> batches = GetBatches();
+
+	const float base_cost = CalculateCost(batches);
 
 	for (size_t i = 0; i < m_Data.weights.size(); i++)
 	{
@@ -132,13 +137,13 @@ void NeuralNetwork::Train_FiniteDifference(NNData& gradient, const array_2d_t& i
 			{
 				float lastValue = m_Data.weights[i].ValueAt(j, k);
 
-				m_Data.weights[i].ValueAt(j, k) += eps;
+				m_Data.weights[i].ValueAt(j, k) += DERIVATIVE_EPS;
 
-				float grad = (CalculateCost(inputs, outputs) - base_cost) / eps;
+				float grad = (CalculateCost(batches) - base_cost) / DERIVATIVE_EPS;
 
 				m_Data.weights[i].ValueAt(j, k) = lastValue;
 
-				gradient.weights[i].ValueAt(j, k) = grad;
+				m_Gradient.weights[i].ValueAt(j, k) = grad;
 			}
 		}
 	}
@@ -151,19 +156,34 @@ void NeuralNetwork::Train_FiniteDifference(NNData& gradient, const array_2d_t& i
 			{
 				float lastValue = m_Data.biases[i].ValueAt(j, k);
 
-				m_Data.biases[i].ValueAt(j, k) += eps;
+				m_Data.biases[i].ValueAt(j, k) += DERIVATIVE_EPS;
 
-				float grad = (CalculateCost(inputs, outputs) - base_cost) / eps;
+				float grad = (CalculateCost(batches) - base_cost) / DERIVATIVE_EPS;
 
 				m_Data.biases[i].ValueAt(j, k) = lastValue;
 
-				gradient.biases[i].ValueAt(j, k) = grad;
+				m_Gradient.biases[i].ValueAt(j, k) = grad;
 			}
 		}
 	}
 }
 
-void NeuralNetwork::Learn(NNData& gradient, float rate)
+void NeuralNetwork::SetTrainingData(const array_2d_t& inputs, const array_2d_t& outputs)
+{
+	ASSERT(inputs.size() == outputs.size());
+
+	m_Inputs = inputs;
+	m_Outputs = outputs;
+}
+
+void NeuralNetwork::SetStochastic(size_t batchesCount)
+{
+	ASSERT(batchesCount <= m_Inputs.size());
+
+	m_BatchesCount = batchesCount;
+}
+
+void NeuralNetwork::Learn(float rate)
 {
 	for (size_t i = 0; i < m_Data.weights.size(); i++)
 	{
@@ -171,7 +191,7 @@ void NeuralNetwork::Learn(NNData& gradient, float rate)
 		{
 			for (size_t k = 0; k < m_Data.weights[i].GetColumnsSize(); k++)
 			{
-				m_Data.weights[i].ValueAt(j, k) -= rate * gradient.weights[i].ValueAt(j, k);
+				m_Data.weights[i].ValueAt(j, k) -= rate * m_Gradient.weights[i].ValueAt(j, k);
 			}
 		}
 	}
@@ -182,7 +202,7 @@ void NeuralNetwork::Learn(NNData& gradient, float rate)
 		{
 			for (size_t k = 0; k < m_Data.biases[i].GetColumnsSize(); k++)
 			{
-				m_Data.biases[i].ValueAt(j, k) -= rate * gradient.biases[i].ValueAt(j, k);
+				m_Data.biases[i].ValueAt(j, k) -= rate * m_Gradient.biases[i].ValueAt(j, k);
 			}
 		}
 	}
@@ -222,20 +242,18 @@ std::vector<float> NeuralNetwork::Forward(const std::vector<float>& params)
 	return res;
 }
 
-float NeuralNetwork::CalculateCost(const array_2d_t& inputs, const array_2d_t& outputs)
+float NeuralNetwork::CalculateCost(const std::vector<NNBatch>& batches)
 {
-	ASSERT(inputs.size() == outputs.size());
-
 	float cost = 0.0f, d = 0.0f;
-	size_t n = inputs.size();
+	size_t n = batches.size();
 
 	for (size_t i = 0; i < n; i++)
 	{
-		const std::vector<float>& result = Forward(inputs[i]);
+		const std::vector<float> result = Forward(batches[i].inputs);
 
 		for (size_t j = 0; j < result.size(); j++)
 		{
-			d = result[j] - outputs[i][j];
+			d = result[j] - batches[i].outputs[j];
 			cost += d * d;
 		}
 	}
@@ -266,6 +284,39 @@ void NeuralNetwork::RandomizeLayers(float min, float max)
 			}
 		}
 	}
+}
+
+std::vector<NNBatch> NeuralNetwork::GetBatches() const
+{
+	std::vector<NNBatch> batches;
+
+	if (m_BatchesCount > 0)
+	{
+		std::vector<size_t> indexes;
+
+		indexes.reserve(m_Inputs.size());
+
+		for (size_t i = 0; i < m_Inputs.size(); i++)
+		{
+			indexes.push_back(i);
+		}
+
+		std::random_shuffle(indexes.begin(), indexes.end());
+
+		for (size_t i = 0; i < m_BatchesCount; i++)
+		{
+			batches.push_back({ m_Inputs[indexes[i]], m_Outputs[indexes[i]] });
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < m_Inputs.size(); i++)
+		{
+			batches.push_back({ m_Inputs[i], m_Outputs[i] });
+		}
+	}
+
+	return batches;
 }
 
 const NNData& NeuralNetwork::GetData() const

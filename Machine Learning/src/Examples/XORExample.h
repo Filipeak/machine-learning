@@ -6,7 +6,7 @@
 class XORExample : public ExampleBase
 {
 public:
-	XORExample() : m_NN(0), m_Grad(0) {}
+	XORExample() : m_NN(0) {}
 
 	void Prepare() override;
 	void RunIteration() override;
@@ -16,5 +16,4 @@ public:
 
 private:
 	NeuralNetwork* m_NN;
-	NNData* m_Grad;
 };

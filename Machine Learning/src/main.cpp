@@ -5,10 +5,8 @@
 *
 * IDEAS:
 *  - GFX - Neural Network Visualization & Includes checkup (Glad, GLFW, Imgui)
-*  - Stochastic Gradient Descent
 *  - Exporting / Importing
 *  - Drawing Example
-*  - Optimization: Pointers & References checkup
 */
 
 
@@ -18,26 +16,40 @@
 #include "GFX/NeuralNetworkVisualization.h"
 #include "Examples/XORExample.h"
 
+#define ENABLE_GFX 1
+
 int main()
 {
 	std::srand((unsigned int)std::time(0));
 
+#if ENABLE_GFX
 	Window::Init();
+#endif
 
-	auto ex = XORExample();
-	auto costPlot = CostPlot();
-	auto nnVisualization = NeuralNetworkVisualization();
-
-	ex.InitBackprop(0.1f, 20000);
+	XORExample ex = XORExample();
+	ex.InitBackprop(0.1f, 25000);
 	ex.Prepare();
-	nnVisualization.Init();
 
+#if ENABLE_GFX
+	CostPlot costPlot = CostPlot();
+	NeuralNetworkVisualization nnVisualization = NeuralNetworkVisualization();
+
+	nnVisualization.Init();
+#endif
+
+#if ENABLE_GFX
 	while (!Window::ShouldClose())
+#else
+	while (true)
+#endif
 	{
+#if ENABLE_GFX
 		Window::BeginFrame();
+#endif
 
 		ex.RunIteration();
 
+#if ENABLE_GFX
 		if (!ex.IsFinished())
 		{
 			costPlot.Update(ex.GetCost());
@@ -47,9 +59,12 @@ int main()
 		nnVisualization.Update(ex.GetData());
 
 		Window::EndFrame();
+#endif
 	}
 
+#if ENABLE_GFX
 	nnVisualization.Terminate();
 
 	Window::Terminate();
+#endif
 }

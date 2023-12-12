@@ -7,11 +7,10 @@ void ExampleBase::InitBackprop(float learningRate, size_t iterations)
 	m_MaxIterations = iterations;
 }
 
-void ExampleBase::InitGradDescent(float learningRate, float derivativeEps, size_t iterations)
+void ExampleBase::InitFiniteDiff(float learningRate, size_t iterations)
 {
 	m_Backpropagation = false;
 	m_LearningRate = learningRate;
-	m_DerivativeEps = derivativeEps;
 	m_MaxIterations = iterations;
 }
 

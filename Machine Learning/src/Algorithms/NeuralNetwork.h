@@ -6,6 +6,8 @@
 
 #include "../Math/Matrix.h"
 
+#define DERIVATIVE_EPS 0.001f;
+
 enum class NNActivationFunction
 {
 	Sigmoid = 0,
@@ -19,8 +21,14 @@ struct NNData
 	std::vector<Matrix> weights;
 	std::vector<Matrix> biases;
 
-	void Alloc(const std::vector<size_t> architecture);
+	void Alloc(const std::vector<size_t>& architecture);
 	void Clear();
+};
+
+struct NNBatch
+{
+	std::vector<float> inputs;
+	std::vector<float> outputs;
 };
 
 class NeuralNetwork
@@ -28,20 +36,27 @@ class NeuralNetwork
 public:
 	NeuralNetwork(const std::vector<size_t>& architecture, NNActivationFunction func);
 
-	void Train_Backpropagation(NNData& gradient, const array_2d_t& inputs, const array_2d_t& outputs);
-	void Train_FiniteDifference(NNData& gradient, const array_2d_t& inputs, const array_2d_t& outputs, float eps);
+	void Train_Backpropagation();
+	void Train_FiniteDifference();
 
-	void Learn(NNData& gradient, float rate);
+	void SetTrainingData(const array_2d_t& inputs, const array_2d_t& outputs);
+	void SetStochastic(size_t batchesCount);
+	void Learn(float rate);
 	std::vector<float> Forward(const std::vector<float>& params);
-	float CalculateCost(const array_2d_t& inputs, const array_2d_t& outputs);
+	float CalculateCost(const std::vector<NNBatch>& batches);
 	void RandomizeLayers(float min, float max);
 
+	std::vector<NNBatch> GetBatches() const;
 	const NNData& GetData() const;
 	void Print();
 
 private:
 	NNData m_Data;
+	NNData m_Gradient;
 	NNActivationFunction m_Func;
+	array_2d_t m_Inputs;
+	array_2d_t m_Outputs;
+	size_t m_BatchesCount;
 	std::vector<Matrix> m_Layers;
 	std::vector<Matrix> m_LayersRaw;
 	std::function<float(float)> m_ActivationFunction;
