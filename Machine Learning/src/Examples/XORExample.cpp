@@ -21,7 +21,6 @@ void XORExample::Prepare()
 	m_NN = new NeuralNetwork(layers, NNActivationFunction::Sigmoid);
 	m_NN->RandomizeLayers(0.0f, 1.0f);
 	m_NN->SetTrainingData(inputs, outputs);
-	m_NN->SetStochastic(2);
 }
 
 void XORExample::RunIteration()
@@ -48,18 +47,16 @@ void XORExample::RunIteration()
 	}
 	else
 	{
-		std::cout << " ======= Current Neural Network Data ======= ";
-		std::cout << " > Cost: " << m_NN->CalculateCost(m_NN->GetBatches()) << std::endl;
+		std::cout << " ======= Neural Network Data ======= " << std::endl;
 
 		m_NN->Print();
+
+		std::cout << "Cost: " << m_NN->CalculateCost(m_NN->GetBatches()) << std::endl;
 
 		std::vector<float> params = { 0, 1 };
 		std::vector<float> result = m_NN->Forward(params);
 
-		for (size_t i = 0; i < result.size(); i++)
-		{
-			std::cout << "Result " << i << ": " << result[i] << std::endl;
-		}
+		std::cout << "0 ^ 1 = " << result[0] << std::endl;
 
 		std::cout << "==========================================" << std::endl;
 
