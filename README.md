@@ -5,7 +5,7 @@ Simple Machine Learning library written in C++
 
 Provides Neural Network and basic linear algebra libraries
 
-## Functionality
+## Features
 - Backpropagation
 - Multiple activation functions (Sigmiod, ReLU, Tanh) 
 - Stochastic Gradient Descent
