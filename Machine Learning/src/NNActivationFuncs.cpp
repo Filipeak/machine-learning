@@ -48,7 +48,7 @@ float NNActivationFuncs::ReLU(float x)
 
 float NNActivationFuncs::ReLU_Derivative(float x)
 {
-	return x > 0.0f ? 1.0f : 0.0f;
+	return x > 0 ? 1 : 0;
 }
 
 float NNActivationFuncs::Tanh(float x)
