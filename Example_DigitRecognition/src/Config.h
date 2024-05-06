@@ -1,0 +1,13 @@
+#pragma once
+
+#define TRAINING_BUILD 0
+#define TRAINING_BATCH_SIZE 8
+#define TRAINING_LEARNING_RATE 0.1f
+
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
+#define WINDOW_NAME "Neural Network"
+
+#define DRAWING_BOARD_SIZE 28
+
+#define TRAINING_ITERATIONS 15000
