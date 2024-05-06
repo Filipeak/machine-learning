@@ -19,7 +19,7 @@ Project is done in Visual Studio 2022, so open .sln file
 ## Preview
 **Digit recognition example**
 
-![](https://github.com/Filipeak/machine-learning/blob/main/res/screenshot.png)
+![](https://github.com/Filipeak/machine-learning/blob/main/res/Animation.gif)
 
 ## Resources
 - 3Blue1Brown Explanation: https://www.3blue1brown.com/topics/neural-networks
