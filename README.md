@@ -18,6 +18,7 @@ Project is done in Visual Studio 2022, so open .sln file
 
 ## Preview
 **Digit recognition example**
+
 ![](https://github.com/Filipeak/machine-learning/blob/main/res/screenshot.png)
 
 ## Resources
