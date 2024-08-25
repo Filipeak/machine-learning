@@ -23,7 +23,7 @@ struct NNBatch
 	std::vector<float> outputs;
 };
 
-// TODO: CUDA acceleration
+// TODO: CUDA acceleration: https://www.youtube.com/watch?v=oQT7IC0x254&list=PLU0zjpa44nPXddA_hWV1U8oO7AevFgXnT
 // TODO: Cross entropy
 // TODO: Backpropagation momentum
 // TODO: Softmax for output layer
