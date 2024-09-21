@@ -160,8 +160,8 @@ static void training_main()
 
 			if (!init)
 			{
-				array_2d_t inputs;
-				array_2d_t outputs;
+				std::vector<std::vector<float>> inputs;
+				std::vector<std::vector<float>> outputs;
 
 				for (const auto& entry : std::filesystem::directory_iterator("mnist"))
 				{
@@ -224,7 +224,7 @@ static void training_main()
 				nn.Train_Backpropagation();
 				nn.Learn(TRAINING_LEARNING_RATE);
 
-				costs.push_back(nn.CalculateCost(nn.GetBatches()));
+				costs.push_back(nn.CalculateCost());
 			}
 			else
 			{
@@ -301,7 +301,7 @@ static void runtime_main()
 
 		if (ImGui::Button("Validate"))
 		{
-			auto data = nn.Forward(board.GetData());
+			std::vector<float> data = nn.Feedforward(board.GetData());
 			float max = 0;
 
 			std::cout << "> New validation" << std::endl;

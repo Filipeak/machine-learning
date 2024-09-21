@@ -155,14 +155,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Matrix.cpp" />
     <ClCompile Include="src\NeuralNetwork.cpp" />
-    <ClCompile Include="src\NNActivationFuncs.cpp" />
+    <ClCompile Include="src\NNUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\NNActivationFuncs.h" />
-    <ClInclude Include="src\NNAssert.h" />
-    <ClInclude Include="src\Matrix.h" />
+    <ClInclude Include="src\NNUtils.h" />
     <ClInclude Include="src\NeuralNetwork.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

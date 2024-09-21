@@ -3,13 +3,13 @@
 
 int main()
 {
-	const array_2d_t inputs = {
+	const std::vector<std::vector<float>> inputs = {
 		{0, 0},
 		{0, 1},
 		{1, 0},
 		{1, 1},
 	};
-	const array_2d_t outputs = {
+	const std::vector<std::vector<float>> outputs = {
 		{0},
 		{1},
 		{1},
@@ -26,10 +26,10 @@ int main()
 		nn.Learn(0.1f);
 	}
 
-	std::cout << "Cost: " << nn.CalculateCost(nn.GetBatches()) << std::endl;
+	std::cout << "Cost: " << nn.CalculateCost() << std::endl;
 
 	std::vector<float> params = { 0, 1 };
-	std::vector<float> result = nn.Forward(params);
+	std::vector<float> result = nn.Feedforward(params);
 
 	std::cout << "0 ^ 1 = " << result[0] << std::endl;
 
