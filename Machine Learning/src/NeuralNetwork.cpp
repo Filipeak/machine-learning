@@ -7,10 +7,13 @@
 
 NeuralNetwork::NeuralNetwork(const std::vector<size_t>& architecture, NNActivationFunction func) : m_Func(func), m_BatchesCount(0)
 {
+	m_Layers.reserve(architecture.size());
+	m_LayersRaw.reserve(architecture.size());
+
 	for (size_t i = 0; i < architecture.size(); i++)
 	{
-		m_Layers.push_back(Matrix(architecture[i], 1));
-		m_LayersRaw.push_back(Matrix(architecture[i], 1));
+		m_Layers.emplace_back(architecture[i], 1);
+		m_LayersRaw.emplace_back(architecture[i], 1);
 	}
 
 	m_Data.Alloc(architecture);
@@ -59,10 +62,13 @@ NeuralNetwork::NeuralNetwork(const std::string& path) : m_Func(NNActivationFunct
 				}
 			}
 
+			m_Layers.reserve(arch.size());
+			m_LayersRaw.reserve(arch.size());
+
 			for (size_t i = 0; i < arch.size(); i++)
 			{
-				m_Layers.push_back(Matrix(arch[i], 1));
-				m_LayersRaw.push_back(Matrix(arch[i], 1));
+				m_Layers.emplace_back(arch[i], 1);
+				m_LayersRaw.emplace_back(arch[i], 1);
 			}
 
 			m_Data.Alloc(arch);
@@ -128,10 +134,11 @@ void NeuralNetwork::Train_Backpropagation()
 	const size_t last_layer_index = m_Layers.size() - 1;
 
 	std::vector<Matrix> acts;
+	acts.reserve(m_Layers.size());
 
 	for (size_t i = 0; i < m_Layers.size(); i++)
 	{
-		acts.push_back(Matrix(m_Layers[i].GetRowsSize(), 1));
+		acts.emplace_back(m_Layers[i].GetRowsSize(), 1);
 	}
 
 	for (size_t i = 0; i < inputs_size; i++)
@@ -249,7 +256,7 @@ float NeuralNetwork::CalculateCost()
 
 std::vector<float> NeuralNetwork::Feedforward(const std::vector<float>& params)
 {
-	NN_ASSERT(m_Layers.size() == params.size());
+	NN_ASSERT(m_Layers[0].GetRowsSize() == params.size());
 
 	for (size_t i = 0; i < m_Layers[0].GetRowsSize(); i++)
 	{
@@ -266,8 +273,10 @@ std::vector<float> NeuralNetwork::Feedforward(const std::vector<float>& params)
 		}
 	}
 
-	std::vector<float> res;
 	const Matrix& lastLayer = m_Layers[m_Layers.size() - 1];
+	std::vector<float> res;
+
+	res.reserve(lastLayer.GetRowsSize());
 
 	for (size_t i = 0; i < lastLayer.GetRowsSize(); i++)
 	{
@@ -356,8 +365,9 @@ std::vector<NNBatch> NeuralNetwork::GetBatches() const
 
 	if (m_BatchesCount > 0)
 	{
-		std::vector<size_t> indexes;
+		batches.reserve(m_BatchesCount);
 
+		std::vector<size_t> indexes;
 		indexes.reserve(m_Inputs.size());
 
 		for (size_t i = 0; i < m_Inputs.size(); i++)
@@ -374,6 +384,8 @@ std::vector<NNBatch> NeuralNetwork::GetBatches() const
 	}
 	else
 	{
+		batches.reserve(m_Inputs.size());
+
 		for (size_t i = 0; i < m_Inputs.size(); i++)
 		{
 			batches.push_back({ m_Inputs[i], m_Outputs[i] });

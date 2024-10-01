@@ -69,7 +69,11 @@ Matrix::Matrix(size_t r, size_t c) : m_Rows(r), m_Columns(c)
 	NN_ASSERT(r > 0);
 	NN_ASSERT(c > 0);
 
-	for (size_t i = 0; i < r * c; i++)
+	size_t totalSize = r * c;
+
+	m_Data.reserve(totalSize);
+
+	for (size_t i = 0; i < totalSize; i++)
 	{
 		m_Data.push_back(0);
 	}
@@ -149,9 +153,12 @@ void NNData::Alloc(const std::vector<size_t>& architecture)
 {
 	arch = architecture;
 
+	weights.reserve(architecture.size() - 1);
+	biases.reserve(architecture.size() - 1);
+
 	for (size_t i = 1; i < architecture.size(); i++)
 	{
-		weights.push_back(Matrix(architecture[i], architecture[i - 1]));
-		biases.push_back(Matrix(architecture[i], 1));
+		weights.emplace_back(architecture[i], architecture[i - 1]);
+		biases.emplace_back(architecture[i], 1);
 	}
 }
