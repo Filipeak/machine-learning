@@ -1,4 +1,4 @@
-# Neural Networks
+# Machine Learning
 
 ## Overview
 Simple Machine Learning library written in C++
@@ -20,6 +20,13 @@ Project is done in Visual Studio 2022, so open .sln file
 **Digit recognition example**
 
 ![](https://github.com/Filipeak/machine-learning/blob/main/res/Animation.gif)
+
+## Next steps
+There is a lot more which can be done. Here are some examples I came across:
+- Convolutional / Recurrent Neural Networks
+- Nvidia CUDA acceleration
+- Transformers (Word embedding, etc.)
+- Adam Optimizer for gradient descent
 
 ## Resources
 - 3Blue1Brown Explanation: https://www.3blue1brown.com/topics/neural-networks
