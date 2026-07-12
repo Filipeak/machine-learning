@@ -1,9 +1,6 @@
-# Machine Learning
+# Tiny Digit Classifier
 
-A small personal experiment for learning how neural networks work — feedforward passes and
-backpropagation written from scratch in C++, with no ML frameworks behind them. It's not meant to be a
-reusable library; the `Machine Learning` project is just a minimal neural-network core that backs two
-example apps: learning a logic gate and recognizing hand-drawn digits.
+A small personal experiment for learning how neural networks work - feedforward passes and backpropagation written from scratch in C++, with no ML frameworks behind them. It's not meant to be a reusable library; the project is just a minimal neural-network core that backs two example apps: learning a logic gate and recognizing hand-drawn digits.
 
 ## Preview
 
@@ -11,7 +8,7 @@ example apps: learning a logic gate and recognizing hand-drawn digits.
 
 ![Digit recognition demo](res/Animation.gif)
 
-**Training** — cost decreasing over time while the digit network learns
+**Training** - cost decreasing over time while the digit network learns
 
 ![Training cost plot](res/Training.png)
 
@@ -22,7 +19,7 @@ example apps: learning a logic gate and recognizing hand-drawn digits.
 - Multiple activation functions: **Sigmoid**, **ReLU**, **Tanh**
 - Random weight/bias initialization
 - Saving and loading trained models to a plain-text `.nn` file
-- A tiny built-in `Matrix` type — no external math dependencies in the core
+- A tiny built-in `Matrix` type - no external math dependencies in the core
 
 ## Project structure
 
@@ -34,10 +31,7 @@ example apps: learning a logic gate and recognizing hand-drawn digits.
 
 ## Setup
 
-Built with **Visual Studio 2022**. Open `Machine Learning.sln`, pick a startup project (`Example_XOR` or
-`Example_DigitRecognition`), and build/run. The examples link against the `Machine Learning` static
-library; the digit-recognition example's third-party libraries are vendored in its `dependencies/` folder,
-so there's nothing to install.
+Built with **Visual Studio 2022**. Open `Machine Learning.sln`, pick a startup project (`Example_XOR` or `Example_DigitRecognition`), and build/run. The examples link against the `Machine Learning` static library; the digit-recognition example's third-party libraries are vendored in its `dependencies/` folder, so there's nothing to install.
 
 ## How it works
 
@@ -60,33 +54,26 @@ for (size_t i = 0; i < 25000; i++)
 std::vector<float> result = nn.Feedforward({ 0, 1 });
 ```
 
-Each training step computes gradients via backpropagation and takes one gradient-descent update.
-With `SetStochastic(batchSize)` a step draws a fresh **random mini-batch** rather than passing over the
-whole dataset - so a "step" here **is not** a full epoch over the training data.
+Each training step computes gradients via backpropagation and takes one gradient-descent update. With `SetStochastic(batchSize)` a step draws a fresh **random mini-batch** rather than passing over the whole dataset - so a "step" here **is not** a full epoch over the training data.
 
 ## Examples
 
 ### XOR
 
-`Example_XOR` trains a small network on a logic gate from four samples and prints the cost and a
-prediction. It's the quickest way to confirm the core builds and learns.
+`Example_XOR` trains a small network on a logic gate from four samples and prints the cost and a prediction. It's the quickest way to confirm the core builds and learns.
 
 ### Digit recognition
 
-`Example_DigitRecognition` opens a 28x28 drawing board. Draw a digit, press **Validate**, and the network
-outputs its prediction. The `mnist/` folder holds the training images (`.pbm` format) and a pre-trained
-model (`data.nn`).
+`Example_DigitRecognition` opens a 28x28 drawing board. Draw a digit, press **Validate**, and the network outputs its prediction. The `mnist/` folder holds the training images (`.pbm` format) and a pre-trained model (`data.nn`).
 
 - **Run mode** (default) loads `mnist/data.nn` and classifies what you draw.
-- **Training mode** retrains from the images in `mnist/`. Set `TRAINING_BUILD` to `1` in
-  `Example_DigitRecognition/src/Config.h` and rebuild; learning rate, batch size, and step count are
-  configurable in the same file.
+- **Training mode** retrains from the images in `mnist/`. Set `TRAINING_BUILD` to `1` in `Example_DigitRecognition/src/Config.h` and rebuild; learning rate, batch size, and step count are configurable in the same file.
 
 The bundled dataset is small (~1000 images), so the classifier is sensitive (and probably overfits) to how you draw but works most
 of the time.
 
 ## Resources
 
-- 3Blue1Brown — Neural Networks: https://www.3blue1brown.com/topics/neural-networks
+- 3Blue1Brown - Neural Networks: https://www.3blue1brown.com/topics/neural-networks
 - YouTube series: https://www.youtube.com/playlist?list=PLpM-Dvs8t0VZPZKggcql-MmjaBdZKeDMw
 - Similar problem walkthrough: https://www.youtube.com/watch?v=hfMk-kjRv4c
